@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { createUIMessageStream, createUIMessageStreamResponse, type UIMessage } from "ai";
 
-const BOT_API_URL = process.env["BOT_API_URL"] ?? "http://localhost:8000/test";
+const BOT_API_URL = process.env["BOT_API_URL"] ?? "http://localhost:8000/chat";
 
 const getLastUserQuestion = (messages: UIMessage[]): string => {
   const lastUser = [...messages].reverse().find((message) => message.role === "user");

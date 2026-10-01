@@ -8,6 +8,7 @@ dependencies = [
     "db>=0.1.1",
     "fastapi[standard]>=0.141.1",
     "langchain>=1.4.2",
+    "langchain-chroma>=1.1.0",
     "langchain-classic>=1.0.8",
     "langchain-community>=0.4.2",
     "langchain-openai>=1.6.5",

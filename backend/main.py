@@ -14,7 +14,7 @@ app.add_middleware(
 )
 
 # Load RAG chain just once at server starting(it's slow when load for every requests)
-#rag_chain = get_rag_chain()
+rag_chain = get_rag_chain()
 
 class TestRequest(BaseModel):
     question: str
@@ -25,22 +25,26 @@ def test(request: TestRequest):
         "answer": "I am FanVault - RAG chatbot for sports fans. What's up?",
     }
 
-# class ChatRequest(BaseModel):
-#     question: str
+class ChatRequest(BaseModel):
+    question: str
 
-# @app.post("/chat")
-# def chat(request: ChatRequest):
-#     result = rag_chain.invoke({"query": request.question})
+@app.post("/chat")
+def chat(request: ChatRequest):
+    result = rag_chain.invoke(request.question)
+    print(result)
+
     
-#     sources = [
-#         doc.metadata.get("source", "Unknown") 
-#         for doc in result["source_documents"]
-#     ]
+    # sources = [
+    #     doc.metadata.get("source", "Unknown") 
+    #     for doc in result["source_documents"]
+    # ]
     
-#     return {
-#         "answer": result["result"],
-#         "sources": list(set(sources))  # remove duplication
-#     }
+    # return {
+    #     "answer": result["result"],
+    #     "sources": list(set(sources))  # remove duplication
+    # }
+
+    return {"answer": result.content}
 
 @app.get("/health")
 def health():

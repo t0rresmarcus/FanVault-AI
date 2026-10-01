@@ -1,7 +1,34 @@
 from langchain_openai import ChatOpenAI, OpenAIEmbeddings
-from langchain_community.vectorstores import Chroma
+from langchain_chroma import Chroma
 from langchain_core.prompts import ChatPromptTemplate
-from langchain_core.runnables import RunnablePassthrough
+from langchain_core.runnables import RunnablePassthrough, RunnableLambda
+
+import os
+from dotenv import load_dotenv
+import logging
+logging.basicConfig(level=logging.INFO)
+
+load_dotenv()
+print(bool(os.getenv("OPENAI_API_KEY")))
+
+logger = logging.getLogger(__name__)
+
+def log_and_format_docs(docs):
+    logger.info("Documents retrieved: %d", len(docs))
+
+    for i, doc in enumerate(docs, start=1):
+        logger.info(
+            "\n--- Retrieved %d ---\n%s\n",
+            i,
+            doc.page_content,
+        )
+
+    return "\n\n".join(doc.page_content for doc in docs)
+
+def format_docs(docs):
+    formatted = "\n\n".join(doc.page_content for doc in docs)
+    print("\n--- Retrieved ---\n", formatted, "\n--- End of Retrieved ---\n")
+    return formatted
 
 def get_rag_chain():
     embeddings = OpenAIEmbeddings(model="text-embedding-3-small")
@@ -26,11 +53,11 @@ def get_rag_chain():
     
     Answer:"""
 
-    prompt = ChatPromptTemplate.from_template(template=prompt_template,input_variables=["context", "question"])
+    prompt = ChatPromptTemplate.from_template(template=prompt_template)
 
     chain = (
         {
-            "context": retriever,
+            "context": retriever | format_docs, #RunnableLambda(log_and_format_docs),
             "question": RunnablePassthrough(),
         }
         | prompt
