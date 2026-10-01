@@ -57,7 +57,7 @@ def get_rag_chain():
 
     chain = (
         {
-            "context": retriever | format_docs, #RunnableLambda(log_and_format_docs),
+            "context": retriever| format_docs, #RunnableLambda(log_and_format_docs),
             "question": RunnablePassthrough(),
         }
         | prompt
