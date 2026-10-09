@@ -12,16 +12,18 @@ load_dotenv()
 print(bool(os.getenv("OPENAI_API_KEY")))
 
 logger = logging.getLogger(__name__)
+sources = []
 
 def log_and_format_docs(docs):
-    logger.info("Documents retrieved: %d", len(docs))
-
+    sources.clear()  # Clear previous sources before logging new ones
     for i, doc in enumerate(docs, start=1):
+        print(f"\n--- Retrieved {i} ---\n", doc)
         logger.info(
             "\n--- Retrieved %d ---\n%s\n",
             i,
             doc.page_content,
         )
+        sources.append(doc.metadata.get("source", "Unknown"))
 
     return "\n\n".join(doc.page_content for doc in docs)
 
@@ -30,7 +32,7 @@ def format_docs(docs):
     print("\n--- Retrieved ---\n", formatted, "\n--- End of Retrieved ---\n")
     return formatted
 
-def get_rag_chain():
+def get_rag_chain_and_sources():
     embeddings = OpenAIEmbeddings(model="text-embedding-3-small")
     
     # load VectorDB in local
@@ -57,11 +59,11 @@ def get_rag_chain():
 
     chain = (
         {
-            "context": retriever| format_docs, #RunnableLambda(log_and_format_docs),
+            "context": retriever|log_and_format_docs, #RunnableLambda(log_and_format_docs),
             "question": RunnablePassthrough(),
         }
         | prompt
         | llm
     )
-    
-    return chain
+
+    return chain, sources

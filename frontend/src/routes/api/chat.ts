@@ -27,6 +27,7 @@ export const Route = createFileRoute("/api/chat")({
         }
 
         let answer: string;
+        let sources: string[] = [];
         try {
           const botResponse = await fetch(BOT_API_URL, {
             method: "POST",
@@ -40,7 +41,7 @@ export const Route = createFileRoute("/api/chat")({
               { status: 502 }
             );
           }
-          const data = (await botResponse.json()) as { answer?: unknown };
+          const data = (await botResponse.json()) as { answer?: unknown, sources?: unknown };
           if (typeof data.answer !== "string" || !data.answer.trim()) {
             return Response.json(
               { message: "The FanVault server returned no answer." },
@@ -48,6 +49,11 @@ export const Route = createFileRoute("/api/chat")({
             );
           }
           answer = data.answer;
+          if (Array.isArray(data.sources)) {
+            sources = data.sources;
+            console.log('----------------sources in frontend----------------');
+            console.log(sources);
+          }
         } catch (error) {
           if (error instanceof DOMException && error.name === "AbortError") throw error;
           return Response.json(

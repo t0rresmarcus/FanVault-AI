@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
-from rag_chain import get_rag_chain
+from rag_chain import get_rag_chain_and_sources
 
 app = FastAPI()
 
@@ -14,7 +14,7 @@ app.add_middleware(
 )
 
 # Load RAG chain just once at server starting(it's slow when load for every requests)
-rag_chain = get_rag_chain()
+rag_chain, sources = get_rag_chain_and_sources()
 
 class TestRequest(BaseModel):
     question: str
@@ -31,20 +31,11 @@ class ChatRequest(BaseModel):
 @app.post("/chat")
 def chat(request: ChatRequest):
     result = rag_chain.invoke(request.question)
-    print(result)
-
     
-    # sources = [
-    #     doc.metadata.get("source", "Unknown") 
-    #     for doc in result["source_documents"]
-    # ]
-    
-    # return {
-    #     "answer": result["result"],
-    #     "sources": list(set(sources))  # remove duplication
-    # }
-
-    return {"answer": result.content}
+    return {
+        "answer": result.content,
+        "sources": list(set(sources))
+        }
 
 @app.get("/health")
 def health():
