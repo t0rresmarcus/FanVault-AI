@@ -42,7 +42,7 @@ def get_rag_chain_and_sources():
     )
     
     # retriever: retrieve k of nearest vector(pieces of document)
-    retriever = vectorstore.as_retriever(search_kwargs={"k": 4})
+    retriever = vectorstore.as_retriever(search_kwargs={"k": 6})
     
     llm = ChatOpenAI(model="gpt-4o-mini", temperature=0)
     
