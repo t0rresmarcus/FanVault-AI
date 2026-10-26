@@ -123,10 +123,10 @@ Load your sports documents into the Chroma vector store:
 python -m app.ingest
 ```
 
-### 4. Run the API server
+### 4. Run the API server locally
 
 ```bash
-uvicorn app.main:app --reload --port 8000
+uv run fastapi dev main.py --host 0.0.0.0 --port 8000
 ```
 
 The API is now available at `http://localhost:8000`, with interactive docs at `http://localhost:8000/docs`.
